@@ -58,7 +58,10 @@ def srt_formatter(num_caption, timestamp_start, timestamp_end, caption):
 
 # it creates a srt file with name file_name
 def srt_creation(file_name, output, dataframe):
-    f = open(output+os.path.sep+file_name + ".srt", "w")
+    f = open(output + os.path.sep + file_name + ".srt", "w")
+
+    # the VIA format isn't ordered by the srart time of the intervals
+    dataframe = dataframe.sort_values('timestamp_start')
 
     for index, annotation in dataframe.iterrows():
         timestamp_start = timestamp_converter(annotation['timestamp_start'])
@@ -89,4 +92,4 @@ if __name__ == '__main__':
 
     intervals = read_intervals(filename)
     df = intervals_dataframe_creation(intervals)
-    srt_creation("temp3", output, df)
+    srt_creation("Video (4)", output, df)
