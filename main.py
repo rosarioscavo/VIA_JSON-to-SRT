@@ -56,18 +56,18 @@ def srt_formatter(num_caption, timestamp_start, timestamp_end, caption):
     return stamp
 
 
-# def srt_creation(file_name, dataframe):
-#     # f = open(file_name+".srt", "w")
-#     # f.write()
-#     # f.close()
-#     df = dataframe[:2]
-#     annotation = df.loc[1]
-#
-#     timestamp_start = timestamp_converter(annotation['timestamp_start'])
-#     timestamp_end = timestamp_converter(annotation['timestamp_end'])
-#
-#     stamp = srt_formatter(annotation['num_caption'], timestamp_start, timestamp_end, annotation['caption'])
-#     print(stamp)
+# it creates a srt file with name file_name
+def srt_creation(file_name, output, dataframe):
+    f = open(output+os.path.sep+file_name + ".srt", "w")
+
+    for index, annotation in dataframe.iterrows():
+        timestamp_start = timestamp_converter(annotation['timestamp_start'])
+        timestamp_end = timestamp_converter(annotation['timestamp_end'])
+
+        stamp = srt_formatter(annotation['num_caption'], timestamp_start, timestamp_end, annotation['caption'])
+        f.write(stamp)
+
+    f.close()
 
 
 # main
@@ -89,4 +89,4 @@ if __name__ == '__main__':
 
     intervals = read_intervals(filename)
     df = intervals_dataframe_creation(intervals)
-    # srt_creation("video(4)", df)
+    srt_creation("temp3", output, df)
