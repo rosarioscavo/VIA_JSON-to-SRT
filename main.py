@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import pandas as pd
+import numpy as np
 
 
 # return the intervals' info after reading a json file from the filename path
@@ -21,19 +22,17 @@ def read_intervals(filename):
 
 # it creates a dataframe with all the annotations' information for each interval present in intervals
 def intervals_dataframe_creation(intervals):
-    num_caption = 1
-    df = pd.DataFrame(columns=['num_caption', 'caption', 'timestamp_start', 'timestamp_end'])
+    df = pd.DataFrame(columns=['caption', 'timestamp_start', 'timestamp_end'])
 
     for interval_info in intervals:
         caption = interval_info['av']['1']
         timestamp_start = interval_info['z'][0]
         timestamp_end = interval_info['z'][1]
 
-        new_row = {'num_caption': num_caption, 'caption': caption, 'timestamp_start': timestamp_start,
+        new_row = {'caption': caption, 'timestamp_start': timestamp_start,
                    'timestamp_end': timestamp_end}
 
         df = df.append(new_row, ignore_index=True)
-        num_caption += 1
 
     return df
 
@@ -60,14 +59,15 @@ def srt_formatter(num_caption, timestamp_start, timestamp_end, caption):
 def srt_creation(file_name, output, dataframe):
     f = open(output + os.path.sep + file_name + ".srt", "w")
 
-    # the VIA format isn't ordered by the srart time of the intervals
+    # the VIA format isn't ordered by the start time of the intervals
     dataframe = dataframe.sort_values('timestamp_start')
+    dataframe.index = np.arange(0, len(dataframe))
 
     for index, annotation in dataframe.iterrows():
         timestamp_start = timestamp_converter(annotation['timestamp_start'])
         timestamp_end = timestamp_converter(annotation['timestamp_end'])
 
-        stamp = srt_formatter(annotation['num_caption'], timestamp_start, timestamp_end, annotation['caption'])
+        stamp = srt_formatter(index, timestamp_start, timestamp_end, annotation['caption'])
         f.write(stamp)
 
     f.close()
