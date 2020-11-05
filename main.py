@@ -8,8 +8,20 @@ import pandas as pd
 import numpy as np
 
 
+# it returns the video's name that has been annotated
+def get_video_name(filename):
+    try:
+        with open(filename) as json_file:
+            data = json.load(json_file)
+    except ValueError:
+        print("Perhaps the file is not a JSON file")
+    else:
+        filename = data['file']['1']['fname']
+        return filename.split(".", 1)[0]
+
+
 # return the intervals' info after reading a json file from the filename path
-def read_intervals(filename):
+def get_intervals(filename):
     try:
         with open(filename) as json_file:
             data = json.load(json_file)
@@ -74,7 +86,7 @@ def srt_creation(file_name, output, dataframe):
 
 
 # main
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-f", "--file", help="Path to the .json file")
@@ -87,9 +99,24 @@ if __name__ == '__main__':
 
     if args.file:
         filename = args.file
+    else:
+        if args.folder:
+            filename = args.file
+        else:
+            print("It is necessary to specify a file or a folder")
+            sys.exit(1)
+
     if args.output:
         output = args.output
+    else:
+        print("It is necessary to specify the output folder")
+        sys.exit(1)
 
-    intervals = read_intervals(filename)
+    video_name = get_video_name(filename)
+    intervals = get_intervals(filename)
     df = intervals_dataframe_creation(intervals)
-    srt_creation("Video (4)", output, df)
+    srt_creation(video_name, output, df)
+
+
+if __name__ == '__main__':
+    main()
