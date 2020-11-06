@@ -2,37 +2,33 @@ import argparse
 import json
 import math
 import os
+import sys
 import time
 import pandas as pd
 import numpy as np
 
 
+# it returns the via json file or None if it's in the correct format
+def get_via_json(filename):
+    with open(filename) as json_file:
+        file = json.load(json_file)
+        # check whatever it's a via json file
+        try:
+            var = file['file']['1']['fname']
+            return file
+        except KeyError:
+            return None
+
+
 # it returns the video's name that has been annotated
-def get_video_name(filename):
-    try:
-        with open(filename) as json_file:
-            data = json.load(json_file)
-    except ValueError:
-        print("Perhaps the file is not a JSON file")
-    else:
-        filename = data['file']['1']['fname']
-        return filename.split(".", 1)[0]
+def get_video_name(json_file):
+    filename = json_file['file']['1']['fname']
+    return filename.split(".", 1)[0]
 
 
-# return the intervals' info after reading a json file from the filename path
-def get_intervals(filename):
-    try:
-        with open(filename) as json_file:
-            data = json.load(json_file)
-    except ValueError:
-        print("Perhaps the file is not a JSON file")
-    else:
-        # the intervals are a dictionary
-        return data['metadata'].values()
-
-
-# it creates a dataframe with all the annotations' information for each interval present in intervals
-def intervals_dataframe_creation(intervals):
+# it creates a dataframe with all the annotations' information for each interval
+def intervals_dataframe_creation(json_file):
+    intervals = json_file['metadata'].values()
     df = pd.DataFrame(columns=['caption', 'timestamp_start', 'timestamp_end'])
 
     for interval_info in intervals:
@@ -90,27 +86,26 @@ def srt_creation(file_name, output, dataframe):
 
 # steps to convert .json to .srt
 def algorithm(filename, output):
-    video_name = get_video_name(filename)
-    print(video_name)
-    intervals = get_intervals(filename)
-    df = intervals_dataframe_creation(intervals)
-    srt_creation(video_name, output, df)
+    f = get_via_json(filename)
+    if f is not None:
+        if output is None:
+            output = os.path.dirname(filename) + os.path.sep
+        video_name = get_video_name(f)
+        df = intervals_dataframe_creation(f)
+        srt_creation(video_name, output, df)
 
 
 # main program
-def via_json_to_srt(filename, output):
-    if os.path.isfile(filename):
-        if output is None:
-            output = os.path.dirname(filename) + os.path.sep
-        algorithm(filename, output)
-    else:
-        directory = os.path.dirname(filename)
-        for filename in os.scandir(directory):
-            output_path = output
-            if filename.path.endswith(".json") and filename.is_file():
-                if output is None:
-                    output_path = os.path.dirname(filename) + os.path.sep
-                algorithm(filename, output_path)
+def files_iteration(filename, output):
+    directory = os.path.dirname(filename)
+    empty = True
+    for filename in os.scandir(directory):
+        if filename.path.endswith(".json") and filename.is_file():
+            empty = False
+            algorithm(filename, output)
+
+    if empty:
+        print("The folder passed doesn't contain any .json files")
 
 
 # main
@@ -124,25 +119,30 @@ def main():
                              "same location of .json file(s)")
     args = parser.parse_args()
 
-    filename = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/"
-    output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/temp/"
+    args.folder = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/"
+    # args.output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/temp/"
 
-    # if args.file:
-    #     filename = args.file
-    # else:
-    #     if args.folder:
-    #         filename = args.file
-    #     else:
-    #         print("It is necessary to specify a file or a folder")
-    #         sys.exit(1)
-    #
-    # if args.output:
-    #     output = args.output
-    # else:
-    #     print("It is necessary to specify the output folder")
-    #     sys.exit(1)
-    output= None
-    via_json_to_srt(filename, output)
+    if args.output:
+        output = args.output
+    else:
+        output = None
+
+    if args.file:
+        if os.path.isfile(args.file):
+            algorithm(args.file, output)
+        else:
+            print("The path passed isn't a file")
+            sys.exit(1)
+    else:
+        if args.folder:
+            if os.path.isdir(args.folder):
+                files_iteration(args.folder, output)
+            else:
+                print("The path passed isn't a folder")
+                sys.exit(1)
+        else:
+            print("It is necessary to specify a file or a folder")
+            sys.exit(1)
 
 
 if __name__ == '__main__':
