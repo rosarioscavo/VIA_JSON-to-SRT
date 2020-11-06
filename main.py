@@ -36,6 +36,10 @@ def intervals_dataframe_creation(intervals):
     df = pd.DataFrame(columns=['caption', 'timestamp_start', 'timestamp_end'])
 
     for interval_info in intervals:
+        # if it's a region
+        if len(interval_info['xy']) > 0:
+            continue
+
         caption = interval_info['av']['1']
         timestamp_start = interval_info['z'][0]
         timestamp_end = interval_info['z'][1]
@@ -84,28 +88,44 @@ def srt_creation(file_name, output, dataframe):
     f.close()
 
 
+# steps to convert .json to .srt
+def algorithm(filename, output):
+    video_name = get_video_name(filename)
+    print(video_name)
+    intervals = get_intervals(filename)
+    df = intervals_dataframe_creation(intervals)
+    srt_creation(video_name, output, df)
+
+
 # main program
-def via_json_to_srt(directory, output):
-    directory = os.path.dirname(directory)
-    for filename in os.scandir(directory):
-        if filename.path.endswith(".json") and filename.is_file():
-            video_name = get_video_name(filename)
-            intervals = get_intervals(filename)
-            df = intervals_dataframe_creation(intervals)
-            srt_creation(video_name, output, df)
+def via_json_to_srt(filename, output):
+    if os.path.isfile(filename):
+        if output is None:
+            output = os.path.dirname(filename) + os.path.sep
+        algorithm(filename, output)
+    else:
+        directory = os.path.dirname(filename)
+        for filename in os.scandir(directory):
+            output_path = output
+            if filename.path.endswith(".json") and filename.is_file():
+                if output is None:
+                    output_path = os.path.dirname(filename) + os.path.sep
+                algorithm(filename, output_path)
 
 
 # main
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-f", "--file", help="Path to the .json file")
+    parser.add_argument("-f", "--file", help="Path to a .json file or directory")
     parser.add_argument("-fo", "--folder", help="Path to a folder. It'll load only .json files")
-    parser.add_argument("-o", "--output", help="Output folder for .srt file(s)")
+    parser.add_argument("-o", "--output",
+                        help="Output folder for .srt file(s). If not specified, the .srt file(s) will be saved on the "
+                             "same location of .json file(s)")
     args = parser.parse_args()
 
-    filename = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/temp3.json"
-    output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/"
+    filename = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/"
+    output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/temp/"
 
     # if args.file:
     #     filename = args.file
@@ -121,7 +141,7 @@ def main():
     # else:
     #     print("It is necessary to specify the output folder")
     #     sys.exit(1)
-
+    output= None
     via_json_to_srt(filename, output)
 
 
