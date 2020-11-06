@@ -115,18 +115,19 @@ def files_iteration(folder, output):
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-f", "--file", help="Path to a .json file or directory")
-    parser.add_argument("-fo", "--folder", help="Path to a folder. It'll load only .json files")
+    parser.add_argument("-f", "--file", help="path to a .json file")
+    parser.add_argument("-fo", "--folder", help="path to a folder. It'll load only .json files")
     parser.add_argument("-o", "--output",
-                        help="Output folder for .srt file(s). If not specified, the .srt file(s) will be saved on the "
+                        help="output folder for .srt file(s). If not specified, the .srt file(s) will be saved on the "
                              "same location of .json file(s)")
     args = parser.parse_args()
 
-    args.folder = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/"
-   # args.output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/ciao/"
-
     if args.output:
-        output = args.output
+        if not os.path.isdir(args.output):
+            print("The output folder isn't a folder")
+            sys.exit(1)
+        else:
+            output = args.output
     else:
         output = None
 
