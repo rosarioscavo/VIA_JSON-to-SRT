@@ -12,12 +12,18 @@ import numpy as np
 def get_via_json(filename):
     with open(filename) as json_file:
         file = json.load(json_file)
+
         # check whatever it's a via json file
-        try:
-            var = file['file']['1']['fname']
-            return file
-        except KeyError:
+        if not "fname" in file['file']['1']:
             return None
+        else:
+            return file
+
+        # try:
+        #     var = file['file']['1']['fname']
+        #     return file
+        # except KeyError:
+        #     return None
 
 
 # it returns the video's name that has been annotated
@@ -134,6 +140,7 @@ def main():
     if args.file:
         if os.path.isfile(args.file):
             algorithm(args.file, output)
+            sys.exit(0)
         else:
             print("The path passed isn't a file")
             sys.exit(1)
@@ -148,6 +155,7 @@ def main():
             print("It is necessary to specify a file or a folder")
             sys.exit(1)
 
+    sys.exit(0)
 
 if __name__ == '__main__':
     main()
