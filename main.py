@@ -2,7 +2,6 @@ import argparse
 import json
 import math
 import os
-import sys
 import time
 import pandas as pd
 import numpy as np
@@ -69,7 +68,7 @@ def srt_formatter(num_caption, timestamp_start, timestamp_end, caption):
 
 # it creates a srt file with name file_name
 def srt_creation(file_name, output, dataframe):
-    f = open(output + os.path.sep + file_name + ".srt", "w")
+    f = open(output + file_name + ".srt", "w")
 
     # the VIA format isn't ordered by the start time of the intervals
     dataframe = dataframe.sort_values('timestamp_start')
@@ -85,6 +84,17 @@ def srt_creation(file_name, output, dataframe):
     f.close()
 
 
+# main program
+def via_json_to_srt(directory, output):
+    directory = os.path.dirname(directory)
+    for filename in os.scandir(directory):
+        if filename.path.endswith(".json") and filename.is_file():
+            video_name = get_video_name(filename)
+            intervals = get_intervals(filename)
+            df = intervals_dataframe_creation(intervals)
+            srt_creation(video_name, output, df)
+
+
 # main
 def main():
     parser = argparse.ArgumentParser()
@@ -95,27 +105,24 @@ def main():
     args = parser.parse_args()
 
     filename = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/temp3.json"
-    output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC"
+    output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/"
 
-    if args.file:
-        filename = args.file
-    else:
-        if args.folder:
-            filename = args.file
-        else:
-            print("It is necessary to specify a file or a folder")
-            sys.exit(1)
+    # if args.file:
+    #     filename = args.file
+    # else:
+    #     if args.folder:
+    #         filename = args.file
+    #     else:
+    #         print("It is necessary to specify a file or a folder")
+    #         sys.exit(1)
+    #
+    # if args.output:
+    #     output = args.output
+    # else:
+    #     print("It is necessary to specify the output folder")
+    #     sys.exit(1)
 
-    if args.output:
-        output = args.output
-    else:
-        print("It is necessary to specify the output folder")
-        sys.exit(1)
-
-    video_name = get_video_name(filename)
-    intervals = get_intervals(filename)
-    df = intervals_dataframe_creation(intervals)
-    srt_creation(video_name, output, df)
+    via_json_to_srt(filename, output)
 
 
 if __name__ == '__main__':
