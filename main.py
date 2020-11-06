@@ -96,13 +96,16 @@ def algorithm(filename, output):
 
 
 # main program
-def files_iteration(filename, output):
-    directory = os.path.dirname(filename)
+def files_iteration(folder, output):
+    directory = os.path.dirname(folder)
     empty = True
-    for filename in os.scandir(directory):
-        if filename.path.endswith(".json") and filename.is_file():
-            empty = False
-            algorithm(filename, output)
+
+    for subdir, dirs, files in os.walk(directory):
+        for filename in files:
+            filepath = subdir + os.sep + filename
+            if filepath.endswith(".json"):
+                empty = False
+                algorithm(filepath, output)
 
     if empty:
         print("The folder passed doesn't contain any .json files")
@@ -120,7 +123,7 @@ def main():
     args = parser.parse_args()
 
     args.folder = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/"
-    # args.output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/temp/"
+   # args.output = "/home/rosarioscavo/Documents/dataset/Acquisizioni Lab ENIGMA Scavo/HoloLens/QC/ciao/"
 
     if args.output:
         output = args.output
