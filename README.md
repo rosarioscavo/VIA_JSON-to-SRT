@@ -7,7 +7,7 @@ Annotations on the interface of VIA aren't comfortably viewable, especially for 
 
 ## Table of contents
 
-- [General-info](#general-info)
+- [General info](#general-info)
 
 - [Comparison](#comparison)
 
