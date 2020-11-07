@@ -84,10 +84,11 @@ $ python via_json_to_srt.py --help
 This is the help message:
 
 ```
--h, --help            		show this help message and exit
--f FILE, --file FILE  		path to a .json file
--fo FOLDER, --folder FOLDER path to a folder. It'll load only .json files
--o OUTPUT, --output OUTPUT  output folder for .srt file(s). If not specified, the .srt file(s) will be saved 							 on the same location of .json file(s)
+-h, --help            		                      show this help message and exit
+-f FILE, --file FILE  		                      path to a .json file
+-fo FOLDER, --folder FOLDER path to a folder.   It'll load only .json files
+-o OUTPUT, --output OUTPUT                      output folder for .srt file(s). If not specified, the .srt file(s) will be saved
+                                                on the same location of .json file(s)
 ```
 
 Using the folder argument, the script will convert all the json files that are in the VIA's format in the directory and subdirectories.
