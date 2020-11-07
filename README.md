@@ -9,8 +9,6 @@ Annotations on the interface of VIA aren't comfortably viewable, especially for 
 
 - [General info](#general-info)
 
-- [Comparison](#comparison)
-
 - [Setup](#setup)
 
 - [Usage](#usage)
@@ -34,22 +32,6 @@ The .srt file is created following the [standard format](https://en.wikipedia.or
 4. A blank line
 
 In the .json file also the regions are stored but, they are ignored during the conversion process.
-
-
-
-## Comparison
-
-This is the VIA web interface. Depending on the size of the monitor and the number of labels, it's quite impossible to see all the labels and reproducing the video, you have to scroll down and up in order to see which labels are annotated at that instant.  
-
-
-
-<img src="https://drive.google.com/uc?export=view&id=1hZbIiyC1majH1OSnTpPRPSujrzqK6pLJ" style="zoom:50%;" />
-
-
-
-This is the visualisation using a video player and the .srt file generated.
-
- <img src="https://drive.google.com/uc?export=view&id=1eTOLJcSbJ7QQ9hduwbD6ta9T_DiJjBBb" style="zoom:50%;" />
 
 
 
